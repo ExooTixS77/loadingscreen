@@ -39,6 +39,119 @@ h1 { margin:0; font-size:clamp(42px, 6.5vw, 86px); line-height:.98; letter-spaci
 .link-text strong { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
 .link-text small { font-size:11px; color:var(--muted); }
 .link-arrow { margin-left:auto; color:var(--accent); font-size:18px; }
+.music-control { position:absolute; right:5%; bottom:12%; display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid rgba(255,255,255,.17); background:rgba(12,14,17,.62); color:white; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; backdrop-filter:blur(8px); }
+.music-control:hover { border-color:var(--accent); background:var(--accent-soft); }
+.music-control .music-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); }
+.bottom { position:absolute; left:5%; right:5%; bottom:5%; display:flex; align-items:center; justify-content:space-between; gap:20px; color:rgba(255,255,255,.5); font-size:10px; letter-spacing:2px; text-transform:uppercase; }
+.loading { display:flex; align-items:center; gap:12px; }
+.loading-line { width:90px; height:1px; background:rgba(255,255,255,.16); overflow:hidden; }
+.loading-line::after { content:""; display:block; height:100%; width:35%; background:var(--accent); animation:scan 1.8s ease-in-out infinite; }
+@keyframes scan { from { transform:translateX(-100%); } to { transform:translateX(300%); } }
+@media(max-width:600px) { .music-control { right:6%; bottom:12%; } .top { top:4%; } .brand-label { letter-spacing:1.5px; font-size:10px; } main { left:6%; width:88vw; } h1 { font-size:clamp(38px, 12vw, 62px); letter-spacing:-1px; } .subtitle { font-size:13px; } .links { flex-direction:column; } .link { width:100%; } .bottom { bottom:4%; font-size:9px; letter-spacing:1px; } }
+</style>
+</head>
+<body>
+<div id="background"></div><div class="noise"></div>
+<main>
+  <div class="eyebrow">Bienvenue sur notre serveur</div>
+  <h1 id="serverName">Nom du serveur</h1>
+  <div class="subtitle" id="subtitle">Prépare-toi à découvrir une nouvelle aventure. Le serveur se charge, à bientôt en jeu.</div>
+  <div class="links" id="links"></div>
+</main>
+<button class="music-control" id="musicToggle" type="button"><span class="music-dot"></span><span id="musicLabel">Musique : activer</span></button>
+<div class="bottom"><span id="footerText">Merci de patienter pendant le chargement</span><div class="loading"><span>Chargement</span><span class="loading-line"></span></div></div>
+<audio id="bgMusic" loop preload="auto"></audio>
+<script>
+// ===== CONFIGURATION : modifie uniquement ces valeurs =====
+const CONFIG = {
+  serverName: "NOM DU SERVEUR",
+  tagline: "Serveur Roleplay",
+  subtitle: "Prépare-toi à découvrir une nouvelle aventure. Le serveur se charge, à bientôt en jeu.",
+  background: "background.jpg", // Image à placer à côté de index.html
+  music: "music.mp3", // Musique à placer à côté de index.html
+  musicVolume: 0.35,
+  discord: "https://discord.gg/tonlien",
+  website: "https://tonsite.fr",
+  footer: "Merci de patienter pendant le chargement"
+};
+// =======================================================
+
+const $ = (id) => document.getElementById(id);
+$('serverName').textContent = CONFIG.serverName;
+$('subtitle').textContent = CONFIG.subtitle;
+$('footerText').textContent = CONFIG.footer;
+document.title = CONFIG.serverName + " - Chargement";
+$('background').style.backgroundImage = `url('${CONFIG.background}')`;
+const links = [
+  {label:'Discord', value:CONFIG.discord, icon:'D', hint:'Rejoindre la communauté'},
+  {label:'Site officiel', value:CONFIG.website, icon:'↗', hint:'Visiter notre site'}
+];
+const linksContainer = $('links');
+links.forEach(item => {
+  if (!item.value || item.value.includes('tonlien') || item.value.includes('tonsite')) return;
+  const a = document.createElement('a');
+  a.className = 'link'; a.href = item.value; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  a.innerHTML = `<span class="link-icon">${item.icon}</span><span class="link-text"><strong>${item.label}</strong><small>${item.hint}</small></span><span class="link-arrow">↗</span>`;
+  linksContainer.appendChild(a);
+});
+
+// Musique de fond (les navigateurs peuvent bloquer l'autoplay jusqu'au premier clic)
+const music = $('bgMusic');
+const musicButton = $('musicToggle');
+const musicLabel = $('musicLabel');
+music.src = CONFIG.music;
+music.volume = Math.max(0, Math.min(1, CONFIG.musicVolume));
+function updateMusicButton() { musicLabel.textContent = music.paused ? 'Musique : activer' : 'Musique : désactiver'; }
+musicButton.addEventListener('click', () => {
+  if (music.paused) music.play().then(updateMusicButton).catch(() => { musicLabel.textContent = 'Musique indisponible'; });
+  else { music.pause(); updateMusicButton(); }
+});
+// Tentative d'autoplay, avec bouton visible si le navigateur le bloque.
+music.play().then(updateMusicButton).catch(updateMusicButton);
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chargement du serveur</title>
+<style>
+:root {
+  --accent: #d7a65b;
+  --accent-soft: rgba(215,166,91,.18);
+  --panel: rgba(13,16,20,.72);
+  --text: #f4f2ed;
+  --muted: #b8b7b3;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; width:100%; height:100%; overflow:hidden; font-family: Inter, "Segoe UI", Arial, sans-serif; color:var(--text); background:#0b0d10; }
+#background { position:fixed; inset:0; background: url("background.jpg") center/cover no-repeat; transform:scale(1.04); animation: bgMove 28s ease-in-out infinite alternate; }
+#background::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(7,9,12,.88) 0%, rgba(7,9,12,.56) 48%, rgba(7,9,12,.28) 100%), linear-gradient(0deg, rgba(5,7,9,.72), transparent 55%); }
+@keyframes bgMove { from { transform:scale(1.04); } to { transform:scale(1.12); } }
+.noise { position:fixed; inset:0; pointer-events:none; opacity:.06; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); }
+.top { position:absolute; top:5%; left:5%; right:5%; display:flex; align-items:center; justify-content:space-between; }
+.brand { display:flex; align-items:center; gap:14px; }
+.mark { width:44px; height:44px; border:1px solid rgba(215,166,91,.65); display:grid; place-items:center; color:var(--accent); font-weight:800; letter-spacing:1px; background:rgba(0,0,0,.22); }
+.brand-label { font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+.status { display:flex; align-items:center; gap:9px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#d1d0cb; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px rgba(215,166,91,.65); animation:pulse 2s infinite; }
+@keyframes pulse { 50% { opacity:.35; } }
+main { position:absolute; left:8%; top:50%; transform:translateY(-50%); width:min(650px, 84vw); animation:appear 1s ease both; }
+@keyframes appear { from { opacity:0; transform:translateY(calc(-50% + 20px)); } to { opacity:1; transform:translateY(-50%); } }
+.eyebrow { display:flex; align-items:center; gap:14px; color:var(--accent); text-transform:uppercase; letter-spacing:4px; font-size:11px; font-weight:700; margin-bottom:22px; }
+.eyebrow::before { content:""; width:36px; height:1px; background:var(--accent); }
+h1 { margin:0; font-size:clamp(42px, 6.5vw, 86px); line-height:.98; letter-spacing:-2px; text-transform:uppercase; font-weight:900; text-shadow:0 12px 38px rgba(0,0,0,.45); overflow-wrap:anywhere; }
+.subtitle { margin-top:24px; max-width:440px; color:#c9c8c3; font-size:15px; line-height:1.7; }
+.links { display:flex; gap:12px; flex-wrap:wrap; margin-top:34px; }
+.link { display:flex; align-items:center; gap:12px; padding:15px 19px; min-width:190px; border:1px solid rgba(255,255,255,.17); background:rgba(12,14,17,.62); backdrop-filter:blur(8px); text-decoration:none; color:white; transition:.25s ease; }
+.link:hover { border-color:var(--accent); background:var(--accent-soft); transform:translateY(-3px); }
+.link-icon { width:30px; height:30px; display:grid; place-items:center; color:var(--accent); border:1px solid rgba(215,166,91,.35); font-size:14px; font-weight:800; }
+.link-text { display:flex; flex-direction:column; gap:4px; }
+.link-text strong { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
+.link-text small { font-size:11px; color:var(--muted); }
+.link-arrow { margin-left:auto; color:var(--accent); font-size:18px; }
 .bottom { position:absolute; left:5%; right:5%; bottom:5%; display:flex; align-items:center; justify-content:space-between; gap:20px; color:rgba(255,255,255,.5); font-size:10px; letter-spacing:2px; text-transform:uppercase; }
 .loading { display:flex; align-items:center; gap:12px; }
 .loading-line { width:90px; height:1px; background:rgba(255,255,255,.16); overflow:hidden; }
