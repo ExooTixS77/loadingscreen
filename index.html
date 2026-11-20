@@ -1,274 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Chargement</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chargement du serveur</title>
 <style>
-:root { --a: #19e3ff; --b: #2f6bff; --ink: #06143a; }
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #06143a; color: #fff; font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif; }
+:root {
+  --accent: #d7a65b;
+  --accent-soft: rgba(215,166,91,.18);
+  --panel: rgba(13,16,20,.72);
+  --text: #f4f2ed;
+  --muted: #b8b7b3;
+}
 * { box-sizing: border-box; }
-.abs { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
-
-/* Fond */
-.slide { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.8s; }
-.slide.on { opacity: 1; animation: zoom 24s linear forwards; }
-@keyframes zoom { from { transform: scale(1); } to { transform: scale(1.08); } }
-
-
-/* Haut */
-#brand { position: absolute; top: 4vh; left: 3vw; display: flex; align-items: center; }
-#logo { width: 52px; height: 52px; border-radius: 50%; background: var(--a); color: var(--ink); text-align: center; line-height: 52px; font-weight: 800; font-size: 20px; overflow: hidden; box-shadow: 0 4px 0 var(--b); margin-right: 12px; }
-#logo img { width: 100%; height: 100%; display: block; }
-#tag { text-shadow: 0 2px 8px rgba(0,0,0,.8); font-weight: 700; font-size: 17px; }
-
-#player { position: absolute; top: 4vh; right: 3vw; display: flex; align-items: center; padding: 6px 8px 6px 14px; border-radius: 30px; background: rgba(6,20,58,.85); border: 2px solid rgba(25,227,255,.55); box-shadow: 0 4px 0 rgba(10,60,160,.9); font-size: 13px; }
-#eq { display: inline-block; height: 16px; margin-right: 10px; }
-#eq i { display: inline-block; width: 4px; height: 16px; margin-right: 2px; border-radius: 2px; background: var(--a); transform-origin: bottom; animation: eq .8s ease-in-out infinite; }
-#eq i:nth-child(2) { animation-delay: .2s; } #eq i:nth-child(3) { animation-delay: .4s; }
-#eq.off i { animation-play-state: paused; }
-@keyframes eq { 0%,100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-#trackName { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; font-weight: 700; }
-#player button { border: none; border-radius: 50%; width: 30px; height: 30px; margin-left: 4px; background: var(--a); color: var(--ink); font-size: 12px; font-weight: bold; cursor: pointer; padding: 0; }
-#player button:hover { background: #fff; }
-#vol { width: 70px; margin-left: 8px; }
-
-/* Colonne gauche */
-#left { position: absolute; left: 3vw; top: 15vh; width: 42vw; }
-#hello { display: inline-block; padding: 5px 16px; border-radius: 20px; background: var(--a); color: var(--ink); font-weight: 800; font-size: 15px; transform: rotate(-3deg); box-shadow: 0 3px 0 var(--b); }
-#serverName { margin: 12px 0 0; font-size: 5.6vw; line-height: 1.05; font-weight: 800; text-shadow: 4px 4px 0 var(--b), 0 8px 24px rgba(0,0,0,.5); animation: bob 3.5s ease-in-out infinite; }
-@keyframes bob { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-6px) rotate(0deg); } }
-#subtitle { text-shadow: 0 2px 8px rgba(0,0,0,.8); margin-top: 10px; font-size: 20px; font-weight: 700; color: #cfeaff; }
-#chips { margin: 16px 0 18px; }
-#chips span { display: inline-block; margin: 0 8px 8px 0; padding: 6px 14px; border-radius: 16px; background: rgba(6,20,58,.85); border: 2px solid rgba(25,227,255,.55); font-size: 14px; }
-#chips b { margin-left: 6px; color: var(--a); }
-
-/* Cartes */
-.card { border-radius: 18px; background: rgba(6,20,58,.86); border: 2px solid rgba(25,227,255,.55); box-shadow: 0 6px 0 rgba(10,60,160,.9); padding: 14px 18px 12px; margin-bottom: 16px; }
-.card h3 { display: inline-block; margin: 0 0 10px; padding: 3px 14px; border-radius: 12px; background: var(--a); color: var(--ink); font-size: 15px; font-weight: 800; }
-
-#team .m { display: inline-block; vertical-align: top; width: 31%; margin: 0 1% 6px 0; }
-.av { display: inline-block; vertical-align: middle; width: 34px; height: 34px; border-radius: 50%; line-height: 34px; text-align: center; font-weight: 800; color: var(--ink); margin-right: 8px; }
-.mn { display: inline-block; vertical-align: middle; max-width: 75%; font-size: 14px; font-weight: 700; line-height: 1.15; }
-.mn small { display: block; font-size: 11px; font-weight: 700; opacity: .75; }
-
-/* Colonne droite */
-#right { position: absolute; right: 3vw; top: 15vh; width: 27vw; min-width: 250px; }
-#rulesList { margin: 0; padding: 0; list-style: none; counter-reset: r; font-size: 14px; line-height: 1.35; font-weight: 700; }
-#rulesList li { counter-increment: r; position: relative; padding: 6px 0 6px 38px; }
-#rulesList li:before { content: counter(r); position: absolute; left: 0; top: 4px; width: 27px; height: 27px; border-radius: 50%; background: var(--b); text-align: center; line-height: 27px; font-weight: 800; }
-#links span { display: inline-block; margin: 0 8px 8px 0; padding: 6px 14px; border-radius: 16px; background: var(--b); font-size: 14px; font-weight: 700; }
-#links b { color: #fff; }
-
-/* Bas */
-#bottom { position: absolute; left: 3vw; right: 3vw; bottom: 4vh; }
-#tip { position: relative; display: inline-block; max-width: 70vw; padding: 9px 20px; border-radius: 18px; background: #fff; color: var(--ink); font-weight: 800; font-size: 17px; opacity: 0; margin-bottom: 14px; }
-#tip:after { content: ""; position: absolute; left: 28px; bottom: -10px; border: 10px solid transparent; border-top-color: #fff; border-bottom: 0; }
-#tip.on { opacity: 1; animation: pop .45s ease; }
-@keyframes pop { 0% { transform: scale(.85); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
-#stat { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
-#file { text-shadow: 0 2px 6px rgba(0,0,0,.9); font-size: 13px; font-weight: 700; color: #bfdcff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70vw; padding-bottom: 6px; }
-#pct { font-size: 54px; line-height: .9; font-weight: 800; color: var(--a); text-shadow: 3px 3px 0 var(--b); }
-#wrap { position: relative; }
-#bar { height: 18px; border-radius: 10px; background: rgba(6,20,58,.9); border: 2px solid rgba(25,227,255,.55); overflow: hidden; position: relative; }
-#fill { height: 100%; width: 0; border-radius: 10px; background-color: var(--a); background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,.35), rgba(255,255,255,.35) 10px, rgba(255,255,255,0) 10px, rgba(255,255,255,0) 20px); background-size: 28px 28px; animation: move 1s linear infinite; transition: width .5s; }
-@keyframes move { from { background-position: 0 0; } to { background-position: 28px 0; } }
-#bar.wait #fill { width: 28%; position: absolute; animation: slide 1.5s ease-in-out infinite; }
-@keyframes slide { from { left: -28%; } to { left: 100%; } }
-#thumb { position: absolute; top: -4px; left: 0; width: 26px; height: 26px; margin-left: -13px; border-radius: 50%; background: #fff; border: 4px solid var(--b); box-shadow: 0 0 14px var(--a); transition: left .5s; }
-#wrap.wait #thumb { display: none; }
-
-#veil { background: #06143a; transition: opacity 1s; pointer-events: none; }
-#veil.gone { opacity: 0; }
-
-@media (max-width: 900px) { #right { display: none; } #left { width: 92vw; } #serverName { font-size: 11vw; } }
+html, body { margin:0; width:100%; height:100%; overflow:hidden; font-family: Inter, "Segoe UI", Arial, sans-serif; color:var(--text); background:#0b0d10; }
+#background { position:fixed; inset:0; background: url("background.jpg") center/cover no-repeat; transform:scale(1.04); animation: bgMove 28s ease-in-out infinite alternate; }
+#background::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(7,9,12,.88) 0%, rgba(7,9,12,.56) 48%, rgba(7,9,12,.28) 100%), linear-gradient(0deg, rgba(5,7,9,.72), transparent 55%); }
+@keyframes bgMove { from { transform:scale(1.04); } to { transform:scale(1.12); } }
+.noise { position:fixed; inset:0; pointer-events:none; opacity:.06; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); }
+.top { position:absolute; top:5%; left:5%; right:5%; display:flex; align-items:center; justify-content:space-between; }
+.brand { display:flex; align-items:center; gap:14px; }
+.mark { width:44px; height:44px; border:1px solid rgba(215,166,91,.65); display:grid; place-items:center; color:var(--accent); font-weight:800; letter-spacing:1px; background:rgba(0,0,0,.22); }
+.brand-label { font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+.status { display:flex; align-items:center; gap:9px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#d1d0cb; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px rgba(215,166,91,.65); animation:pulse 2s infinite; }
+@keyframes pulse { 50% { opacity:.35; } }
+main { position:absolute; left:8%; top:50%; transform:translateY(-50%); width:min(650px, 84vw); animation:appear 1s ease both; }
+@keyframes appear { from { opacity:0; transform:translateY(calc(-50% + 20px)); } to { opacity:1; transform:translateY(-50%); } }
+.eyebrow { display:flex; align-items:center; gap:14px; color:var(--accent); text-transform:uppercase; letter-spacing:4px; font-size:11px; font-weight:700; margin-bottom:22px; }
+.eyebrow::before { content:""; width:36px; height:1px; background:var(--accent); }
+h1 { margin:0; font-size:clamp(42px, 6.5vw, 86px); line-height:.98; letter-spacing:-2px; text-transform:uppercase; font-weight:900; text-shadow:0 12px 38px rgba(0,0,0,.45); overflow-wrap:anywhere; }
+.subtitle { margin-top:24px; max-width:440px; color:#c9c8c3; font-size:15px; line-height:1.7; }
+.links { display:flex; gap:12px; flex-wrap:wrap; margin-top:34px; }
+.link { display:flex; align-items:center; gap:12px; padding:15px 19px; min-width:190px; border:1px solid rgba(255,255,255,.17); background:rgba(12,14,17,.62); backdrop-filter:blur(8px); text-decoration:none; color:white; transition:.25s ease; }
+.link:hover { border-color:var(--accent); background:var(--accent-soft); transform:translateY(-3px); }
+.link-icon { width:30px; height:30px; display:grid; place-items:center; color:var(--accent); border:1px solid rgba(215,166,91,.35); font-size:14px; font-weight:800; }
+.link-text { display:flex; flex-direction:column; gap:4px; }
+.link-text strong { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
+.link-text small { font-size:11px; color:var(--muted); }
+.link-arrow { margin-left:auto; color:var(--accent); font-size:18px; }
+.bottom { position:absolute; left:5%; right:5%; bottom:5%; display:flex; align-items:center; justify-content:space-between; gap:20px; color:rgba(255,255,255,.5); font-size:10px; letter-spacing:2px; text-transform:uppercase; }
+.loading { display:flex; align-items:center; gap:12px; }
+.loading-line { width:90px; height:1px; background:rgba(255,255,255,.16); overflow:hidden; }
+.loading-line::after { content:""; display:block; height:100%; width:35%; background:var(--accent); animation:scan 1.8s ease-in-out infinite; }
+@keyframes scan { from { transform:translateX(-100%); } to { transform:translateX(300%); } }
+@media(max-width:600px) { .top { top:4%; } .brand-label { letter-spacing:1.5px; font-size:10px; } main { left:6%; width:88vw; } h1 { font-size:clamp(38px, 12vw, 62px); letter-spacing:-1px; } .subtitle { font-size:13px; } .links { flex-direction:column; } .link { width:100%; } .bottom { bottom:4%; font-size:9px; letter-spacing:1px; } }
 </style>
 </head>
 <body>
-
-<div class="abs" id="bg"></div>
-
-<div id="brand"><div id="logo">RP</div><div id="tag"></div></div>
-
-<div id="player">
-  <span id="eq" class="off"><i></i><i></i><i></i></span>
-  <span id="trackName">&mdash;</span>
-  <button id="play" title="Lecture / Pause">&#9658;</button>
-  <button id="mute" title="Couper le son">&#9835;</button>
-  <input id="vol" type="range" min="0" max="100" value="40">
-</div>
-
-<div id="left">
-  <div id="hello">Bienvenue sur</div>
-  <h1 id="serverName">Chargement</h1>
-  <div id="subtitle"></div>
-  <div id="chips">
-    <span>Map<b id="map">&mdash;</b></span><span>Mode<b id="gamemode">&mdash;</b></span><span>Slots<b id="slots">&mdash;</b></span>
-  </div>
-  <div class="card" id="team"><h3>L'équipe</h3><div id="staffList"></div></div>
-</div>
-
-<div id="right">
-  <div class="card" id="rulesCard"><h3>Règles</h3><ul id="rulesList"></ul></div>
-  <div class="card" id="linksCard"><h3>Nous rejoindre</h3><div id="links"></div></div>
-</div>
-
-<div id="bottom">
-  <div id="tip"></div>
-  <div id="stat"><span id="file">Connexion au serveur...</span><span id="pct">0%</span></div>
-  <div id="wrap" class="wait"><div id="bar" class="wait"><div id="fill"></div></div><div id="thumb"></div></div>
-</div>
-
-<audio id="audio" preload="auto"></audio>
-<div class="abs" id="veil"></div>
-
+<div id="background"></div><div class="noise"></div>
+<main>
+  <div class="eyebrow">Bienvenue sur notre serveur</div>
+  <h1 id="serverName">Nom du serveur</h1>
+  <div class="subtitle" id="subtitle">Prépare-toi à découvrir une nouvelle aventure. Le serveur se charge, à bientôt en jeu.</div>
+  <div class="links" id="links"></div>
+</main>
+<div class="bottom"><span id="footerText">Merci de patienter pendant le chargement</span><div class="loading"><span>Chargement</span><span class="loading-line"></span></div></div>
 <script>
-/* ==================== CONFIGURATION ==================== */
-var CONFIG = {
-  serverName: null,                      // null = nom automatique du serveur
+// ===== CONFIGURATION : modifie uniquement ces valeurs =====
+const CONFIG = {
+  serverName: "NOM DU SERVEUR",
   tagline: "Serveur Roleplay",
-  subtitle: "Prêt à vivre ton aventure ?",
-  logo: null,                            // ex: "logo.png" sinon les initiales s'affichent
-  images: ["background.jpg"],            // 1 image ou plusieurs (diaporama)
-  slideDuration: 10000,
-  music: [ { src: "music.mp3", title: "Ambiance" } ],
-  volume: 0.4,
-  rules: [
-    "Reste dans ton personnage (RP)",
-    "Pas de RDM, ni de FreeKill",
-    "Respecte les autres joueurs",
-    "Les décisions du staff font loi"
-  ],
-  staff: [
-    { name: "Pseudo1", role: "Fondateur" },
-    { name: "Pseudo2", role: "Admin" },
-    { name: "Pseudo3", role: "Modo" }
-  ],
-  links: [ { label: "Discord", value: "discord.gg/tonlien" }, { label: "Site", value: "tonsite.com" } ],
-  tips: ["Tape !help dans le chat pour voir les commandes.", "Un souci ? Ouvre un ticket sur notre Discord.", "Amuse-toi et respecte les autres !"],
-  tipDuration: 6000,
-  accent: "#19e3ff",                     // couleur principale
-  accent2: "#2f6bff"                     // couleur secondaire
+  subtitle: "Prépare-toi à découvrir une nouvelle aventure. Le serveur se charge, à bientôt en jeu.",
+  background: "background.jpg", // Image à placer à côté de index.html
+  discord: "https://discord.gg/tonlien",
+  website: "https://tonsite.fr",
+  footer: "Merci de patienter pendant le chargement"
 };
-/* ======================================================= */
+// =======================================================
 
-function $(id) { return document.getElementById(id); }
-document.documentElement.style.setProperty("--a", CONFIG.accent);
-document.documentElement.style.setProperty("--b", CONFIG.accent2);
-$("tag").textContent = CONFIG.tagline;
-
-/* Fond */
-(function () {
-  var bg = $("bg"), slides = [], cur = 0, k;
-  for (k = 0; k < CONFIG.images.length; k++) {
-    var d = document.createElement("div"); d.className = "slide";
-    d.style.backgroundImage = "url(" + CONFIG.images[k] + ")";
-    bg.appendChild(d); slides.push(d);
-  }
-  if (!slides.length) return;
-  slides[0].className = "slide on";
-  if (slides.length > 1) setInterval(function () {
-    slides[cur].className = "slide"; cur = (cur + 1) % slides.length; slides[cur].className = "slide on";
-  }, CONFIG.slideDuration);
-})();
-
-/* Règles, équipe, liens, astuces */
-(function () {
-  var i, cols = ["#19e3ff", "#8fb4ff", "#ffe14d", "#7dffb0"];
-  var ul = $("rulesList");
-  for (i = 0; i < CONFIG.rules.length; i++) { var li = document.createElement("li"); li.textContent = CONFIG.rules[i]; ul.appendChild(li); }
-  if (!CONFIG.rules.length) $("rulesCard").style.display = "none";
-
-  var sl = $("staffList");
-  for (i = 0; i < CONFIG.staff.length; i++) {
-    var m = document.createElement("div"); m.className = "m";
-    var av = document.createElement("span"); av.className = "av"; av.style.background = cols[i % cols.length];
-    av.textContent = String(CONFIG.staff[i].name).charAt(0).toUpperCase();
-    var mn = document.createElement("span"); mn.className = "mn"; mn.appendChild(document.createTextNode(CONFIG.staff[i].name));
-    var sm = document.createElement("small"); sm.textContent = CONFIG.staff[i].role; mn.appendChild(sm);
-    m.appendChild(av); m.appendChild(mn); sl.appendChild(m);
-  }
-  if (!CONFIG.staff.length) $("team").style.display = "none";
-
-  for (i = 0; i < CONFIG.links.length; i++) {
-    var s = document.createElement("span"); s.appendChild(document.createTextNode(CONFIG.links[i].label + " : "));
-    var b = document.createElement("b"); b.textContent = CONFIG.links[i].value; s.appendChild(b); $("links").appendChild(s);
-  }
-  if (!CONFIG.links.length) $("linksCard").style.display = "none";
-  if (!CONFIG.rules.length && !CONFIG.links.length) $("right").style.display = "none";
-
-  var tip = $("tip"), t = 0;
-  function show() {
-    if (!CONFIG.tips.length) return;
-    tip.className = "";
-    setTimeout(function () { tip.textContent = CONFIG.tips[t]; tip.className = "on"; t = (t + 1) % CONFIG.tips.length; }, 450);
-  }
-  show(); setInterval(show, CONFIG.tipDuration);
-})();
-
-/* Logo */
-function setLogo(name) {
-  var box = $("logo");
-  if (CONFIG.logo) { box.innerHTML = ""; var im = document.createElement("img"); im.src = CONFIG.logo; box.appendChild(im); return; }
-  var w = String(name).replace(/[^A-Za-z0-9]/g, " ").replace(/^\s+|\s+$/g, "").split(/\s+/);
-  box.textContent = ((w[0] || "R").charAt(0) + (w[1] ? w[1].charAt(0) : "")).toUpperCase();
-}
-
-/* Musique */
-(function () {
-  var audio = $("audio"), list = CONFIG.music, idx = 0, muted = false, started = false;
-  if (!list.length) { $("player").style.display = "none"; return; }
-  audio.volume = CONFIG.volume; $("vol").value = Math.round(CONFIG.volume * 100);
-  audio.loop = list.length === 1;
-  function ui(p) { $("play").innerHTML = p ? "&#10074;&#10074;" : "&#9658;"; $("eq").className = p ? "" : "off"; }
-  function load(n) { idx = (n + list.length) % list.length; audio.src = list[idx].src; $("trackName").textContent = list[idx].title || list[idx].src; }
-  function play() { try { var p = audio.play(); if (p && p.catch) p.catch(function () { ui(false); }); } catch (e) {} }
-  audio.addEventListener("play", function () { started = true; ui(true); });
-  audio.addEventListener("pause", function () { ui(false); });
-  audio.addEventListener("ended", function () { load(idx + 1); play(); });
-  audio.addEventListener("error", function () { if (list.length > 1) { load(idx + 1); play(); } });
-  $("play").onclick = function () { if (audio.paused) play(); else audio.pause(); };
-  $("mute").onclick = function () { muted = !muted; audio.muted = muted; $("mute").style.opacity = muted ? ".4" : "1"; };
-  $("vol").oninput = function () { audio.volume = this.value / 100; };
-  function first() { if (!started) play(); }
-  document.addEventListener("click", first); document.addEventListener("keydown", first);
-  load(0); play();
-})();
-
-/* Callbacks appelés par Garry's Mod */
-var total = 0, needed = 0, best = 0;
-function refresh() {
-  if (total > 0) {
-    $("bar").className = ""; $("wrap").className = "";
-    var pct = Math.round((total - needed) / total * 100);
-    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
-    if (pct < best) pct = best; best = pct;
-    $("fill").style.width = pct + "%"; $("thumb").style.left = pct + "%"; $("pct").textContent = pct + "%";
-  } else { $("bar").className = "wait"; $("wrap").className = "wait"; }
-}
-function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-  var name = CONFIG.serverName || servername;
-  $("serverName").textContent = name; $("subtitle").textContent = CONFIG.subtitle;
-  $("map").textContent = mapname; $("gamemode").textContent = gamemode; $("slots").textContent = maxplayers;
-  document.title = name; setLogo(name);
-}
-function SetFilesTotal(t)    { total = t; refresh(); }
-function SetFilesNeeded(n)   { needed = n; refresh(); }
-function DownloadingFile(f)  { $("file").textContent = "Téléchargement : " + String(f).split("/").pop(); }
-function SetStatusChanged(s) { $("file").textContent = s; }
-
-$("subtitle").textContent = CONFIG.subtitle;
-setTimeout(function () { $("veil").className = "abs gone"; }, 100);
-
-/* Démo dans un navigateur : index.html?demo */
-if (location.search.indexOf("demo") !== -1) {
-  GameDetails("Paris Roleplay", "", "rp_downtown_v4c", 64, "0", "DarkRP");
-  SetFilesTotal(150); var n = 150;
-  var tm = setInterval(function () {
-    n -= 2; SetFilesNeeded(n < 0 ? 0 : n);
-    DownloadingFile("materials/exemple/fichier" + (150 - n) + ".vmt");
-    if (n <= 0) { clearInterval(tm); SetStatusChanged("Envoi des infos client..."); }
-  }, 300);
-}
+const $ = (id) => document.getElementById(id);
+$('serverName').textContent = CONFIG.serverName;
+$('tagline').textContent = CONFIG.tagline;
+$('subtitle').textContent = CONFIG.subtitle;
+$('footerText').textContent = CONFIG.footer;
+document.title = CONFIG.serverName + " - Chargement";
+$('background').style.backgroundImage = `url('${CONFIG.background}')`;
+const initials = CONFIG.serverName.trim().split(/\s+/).slice(0,2).map(w => w[0] || '').join('').toUpperCase();
+$('initials').textContent = initials || 'SR';
+const links = [
+  {label:'Discord', value:CONFIG.discord, icon:'D', hint:'Rejoindre la communauté'},
+  {label:'Site officiel', value:CONFIG.website, icon:'↗', hint:'Visiter notre site'}
+];
+const linksContainer = $('links');
+links.forEach(item => {
+  if (!item.value || item.value.includes('tonlien') || item.value.includes('tonsite')) return;
+  const a = document.createElement('a');
+  a.className = 'link'; a.href = item.value; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  a.innerHTML = `<span class="link-icon">${item.icon}</span><span class="link-text"><strong>${item.label}</strong><small>${item.hint}</small></span><span class="link-arrow">↗</span>`;
+  linksContainer.appendChild(a);
+});
 </script>
 </body>
 </html>
